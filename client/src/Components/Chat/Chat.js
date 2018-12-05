@@ -25,13 +25,15 @@ class Chat extends Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.updateOnResize)
-    window.addEventListener('keypress', this.onKeyPress)
-    if (!this.props.replayer) this.chatInput.current.focus();
     this.setState({
       containerCoords: this.chatContainer.current.offsetParent.getBoundingClientRect(),
       chatCoords: this.chatContainer.current.getBoundingClientRect(),
-      chatInputCoords: this.chatInput.current.getBoundingClientRect(),
+      chatInputCoords: this.props.replayer ? null : this.chatInput.current.getBoundingClientRect(),
     })
+    if (!this.props.replayer) {
+      window.addEventListener('keypress', this.onKeyPress)
+      this.chatInput.current.focus();
+    }
     this.scrollToBottom();
   }
 
@@ -117,7 +119,8 @@ class Chat extends Component {
     let messageCoords = target.getBoundingClientRect(); // RENAME THIS ...THIS IS THE CHAT MESSAGE OR CHAT 
     let left = this.state.chatCoords.left - this.state.containerCoords.left
     let top = messageCoords.top - this.state.containerCoords.top;
-    if (messageCoords.top > this.state.chatInputCoords.bottom) {
+    // There is not 'input' when in replayer mode so the calculations are a little different
+    if (!this.props.replayer && messageCoords.top > this.state.chatInputCoords.bottom) {
       top = this.state.chatInputCoords.bottom - this.state.containerCoords.top
     }
     else if (messageCoords.bottom < this.state.containerCoords.top) {
@@ -138,7 +141,7 @@ class Chat extends Component {
 
   updateReferencePositions = () => {
      // INSTEAD OF DOING ALL OF THIS WE COULD JUST SEE HOW THE SCROLL HAS CHANGED AND THEN KNOW HOW TO UPDATE THE DOM LINE?
-     if (this.props.showingReference) {
+    if (this.props.showingReference) {
       // Find and update the position of the referer 
       // this.updateReference()
       this.props.setFromElAndCoords(null, this.getRelativeCoords(this[`message-${this.props.referFromEl}`].current))
