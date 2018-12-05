@@ -149,7 +149,7 @@ module.exports = {
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              plugins: ['transform-decorators-legacy'],
+              plugins: ['transform-decorators-legacy', 'array-includes'],
               compact: true,
             },
           },
